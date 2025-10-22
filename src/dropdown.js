@@ -5,32 +5,43 @@ import chevronUp from "./assets/chevron-up.svg";
 function initialize_dropdown(document) {
   const dropdownButtons = document.getElementsByClassName("dropdown-button");
   for (let dropdownButton of dropdownButtons) {
-    dropdownButton.addEventListener(
-      "click",
-      onDropDownClicked(dropdownButton.parentNode),
-    );
+    const { onDropDownClickedHandler, outsideDropDownClickHandler } =
+      onDropDownClicked(dropdownButton.parentNode);
+    dropdownButton.addEventListener("click", onDropDownClickedHandler);
     dropdownButton.parentElement.dataset.status = "closed";
+    window.addEventListener("click", outsideDropDownClickHandler);
   }
 }
 
 function onDropDownClicked(dropdown) {
   // Using the wrapper here to pass the instance of parent dropdown properly instead of creating a global dependency
   // I could also move the inner function into initialize dropdown function and use the module pattern
-  const dropdown_chevron = dropdown.querySelector("img");
+  const dropdownChevron = dropdown.querySelector("img");
   const dropdownContent = dropdown.querySelector(".dropdown-content");
+  const dropdownButton = dropdown.querySelector(".dropdown-button");
 
-  function onDropDownClickedHandler(event) {
-    dropdownContent.classList.toggle("dropdown-content-show");
-
-    dropdown.dataset.status === "closed"
-      ? dropdownContent.classList.add("dropdown-content-show")
-      : dropdownContent.classList.remove("dropdown-content-show");
-    dropdown_chevron.src =
-      dropdown.dataset.status === "closed" ? chevronUp : chevronDown;
-    dropdown.dataset.status =
-      dropdown.dataset.status === "closed" ? "open" : "closed";
+  function closeDropdown() {
+    dropdownContent.classList.remove("dropdown-content-show");
+    dropdownChevron.src = chevronDown;
+    dropdown.dataset.status = "closed";
   }
-  return onDropDownClickedHandler;
+
+  function openDropdown() {
+    dropdownContent.classList.add("dropdown-content-show");
+    dropdownChevron.src = chevronUp;
+    dropdown.dataset.status = "open";
+  }
+
+  const outsideDropDownClickHandler = function (event) {
+    if (event.target !== dropdownButton && event.target !== dropdownChevron) {
+      // Close dropdown if clicked outside
+      closeDropdown();
+    }
+  };
+  const onDropDownClickedHandler = function (event) {
+    dropdown.dataset.status === "closed" ? openDropdown() : closeDropdown();
+  };
+  return { onDropDownClickedHandler, outsideDropDownClickHandler };
 }
 
 export { initialize_dropdown };
