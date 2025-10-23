@@ -1,5 +1,13 @@
 import chevronLeft from "./assets/chevron-left.svg";
 import chevronRight from "./assets/chevron-right.svg";
+import "./carousal.css";
+
+function setupTimeout(carousal, timeout) {
+  return setTimeout(() => {
+    Carousal.navigateToNextImage(carousal);
+    setupTimeout(carousal, timeout);
+  }, timeout);
+}
 
 export class Carousal {
   constructor(document, carousal_id) {
@@ -20,6 +28,12 @@ export class Carousal {
     carousalFragment.appendChild(this._setupRightNavigationButton());
     this._setupCarousalImages();
     this.carousal.appendChild(carousalFragment);
+    setupTimeout(this, 5000);
+  }
+
+  static timedNavigate(carousal, timeout) {
+    Carousal.navigateToNextImage(carousal);
+    setTimeout(Carousal.timedNavigate, timeout);
   }
 
   static navigateToPreviousImage(carousal) {

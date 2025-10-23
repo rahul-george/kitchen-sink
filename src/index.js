@@ -4,6 +4,5 @@ import "./styles.css";
 
 // initialize_dropdown(document);
 
-// const carousalElement = document.querySelector(".carousal");
 const carousal = new Carousal(document, "#carousal_1");
 carousal.setup();
