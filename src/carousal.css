@@ -23,6 +23,7 @@
 .carousal-img {
   object-fit: contain;
   height: 100%;
+  width: 100%;
   grid-row-start: 1;
   grid-column: 2/3;
 }

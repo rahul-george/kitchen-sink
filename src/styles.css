@@ -3,9 +3,14 @@
   margin: 0;
   padding: 0;
 }
-section {
+
+.dropdown-demo {
+  height: 300px;
+  width: 1000px;
+  margin: 50px;
+}
+.carousal-demo {
   height: 500px;
   width: 400px;
+  margin: 50px;
 }
-
-
