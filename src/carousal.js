@@ -1,5 +1,7 @@
 import chevronLeft from "./assets/chevron-left.svg";
 import chevronRight from "./assets/chevron-right.svg";
+import circleSvg from "./assets/circle.svg";
+import circleSelectedSvg from "./assets/circle-selected.svg";
 import "./carousal.css";
 
 function setupTimeout(carousal, timeout) {
@@ -19,6 +21,7 @@ export class Carousal {
     );
     console.log(this.carousalImages);
     this.currentIdx = 0;
+    this.carousalNavCircles = [];
   }
 
   setup() {
@@ -26,7 +29,9 @@ export class Carousal {
     const carousalFragment = document.createDocumentFragment();
     carousalFragment.appendChild(this._setupLeftNavigationButton());
     carousalFragment.appendChild(this._setupRightNavigationButton());
+    carousalFragment.appendChild(this._generateCarousalNavigationCircles());
     this._setupCarousalImages();
+    this._setupCarousalNavCircles();
     this.carousal.appendChild(carousalFragment);
     setupTimeout(this, 5000);
   }
@@ -42,6 +47,7 @@ export class Carousal {
         ? carousal.carousalImages.length - 1
         : carousal.currentIdx - 1;
     carousal._setupCarousalImages();
+    carousal._setupCarousalNavCircles();
   }
 
   static navigateToNextImage(carousal) {
@@ -50,6 +56,13 @@ export class Carousal {
         ? 0
         : carousal.currentIdx + 1;
     carousal._setupCarousalImages();
+    carousal._setupCarousalNavCircles();
+  }
+
+  static navigateToSelectedImage(carousal, index) {
+    carousal.currentIdx = index;
+    carousal._setupCarousalImages();
+    carousal._setupCarousalNavCircles();
   }
 
   _setupCarousalImages() {
@@ -62,7 +75,38 @@ export class Carousal {
     });
   }
 
-  _generateCarousalNavigationCircles(carousalFragment, count) {}
+  _setupCarousalNavCircles() {
+    this.carousalNavCircles.forEach((element, idx) => {
+      if (idx !== this.currentIdx) {
+        element.src = circleSvg;
+      } else {
+        element.src = circleSelectedSvg;
+      }
+    });
+  }
+
+  _generateNavigationCircle(index) {
+    const circle = document.createElement("img");
+    circle.src = circleSvg;
+    circle.alt = `Navigate to image number ${index}`;
+    circle.classList.add("carousal-index-highlight");
+    circle.dataset.idx = index;
+    circle.addEventListener("click", (e) =>
+      Carousal.navigateToSelectedImage(this, index)
+    );
+    return circle;
+  }
+
+  _generateCarousalNavigationCircles() {
+    const circleContainer = document.createElement("div");
+    circleContainer.classList.add("carousal-nav-circles");
+
+    this.carousalImages.forEach((item, idx) => {
+      this.carousalNavCircles.push(this._generateNavigationCircle(idx));
+      circleContainer.appendChild(this.carousalNavCircles[idx]);
+    });
+    return circleContainer;
+  }
 
   _generateNavigationButton(imgClass, imgSrc, altText, callback) {
     const handle = document.createElement("img");
